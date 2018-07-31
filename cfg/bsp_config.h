@@ -97,10 +97,8 @@
 /**
  * Debug pins for use with a logic analyzer.
  */
-#define BSP_GPIO_C14                    BSP_DEBUGPIN_0
-#define BSP_GPIO_C15                    BSP_DEBUGPIN_1
-#define BSP_GPIO_C2                     BSP_DEBUGPIN_2
-#define BSP_GPIO_C3                     BSP_DEBUGPIN_3
+#define BSP_GPIO_C3                     BSP_DEBUGPIN_0
+#define BSP_GPIO_C2                     BSP_DEBUGPIN_1
 
 /**
  * If enabled bsp_assert.h will implement assertions.
