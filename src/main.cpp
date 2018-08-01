@@ -90,6 +90,19 @@ int8_t cmd_info(char *argv[], uint8_t argc)
     return 0;
 }
 
+int8_t cmd_reg(char *argv[], uint8_t argc)
+{
+	unused(argv);
+    unused(argc);
+
+    printf("Flash registers:\n");
+    printf("ACR: 0x%0x\n", FLASH->ACR);
+    printf("SR:  0x%0x\n", FLASH->SR);
+    printf("CR:  0x%0x\n", FLASH->CR);
+
+    return 0;
+}
+
 void memdump(uint8_t *addr, uint16_t num, bool ascii)
 {
     uint8_t *wrapAddr=0;
@@ -290,6 +303,7 @@ cliCmd_t cmd_table[] =
    {"ver", cmd_ver},
    {"help", cmd_help},
    {"info", cmd_info},
+   {"reg", cmd_reg},
    {"dump", cmd_dump},
    {"clr", cmd_clrPage},
    {"write", cmd_write},
