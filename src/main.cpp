@@ -98,9 +98,9 @@ int8_t cmd_reg(char *argv[], uint8_t argc)
     unused(argc);
 
     printf("Flash registers:\n");
-    printf("ACR: 0x%0x\n", FLASH->ACR);
-    printf("SR:  0x%0x\n", FLASH->SR);
-    printf("CR:  0x%0x\n", FLASH->CR);
+    printf("ACR: 0x%0lx\n", FLASH->ACR);
+    printf("SR:  0x%0lx\n", FLASH->SR);
+    printf("CR:  0x%0lx\n", FLASH->CR);
 
     return 0;
 }
@@ -111,7 +111,7 @@ void memdump(uint8_t *addr, uint16_t num, bool ascii)
 
     while(num > 0)
     {
-        printf(" %x| ", addr);
+        printf(" %lx| ", (uint32_t) addr);
         wrapAddr = addr+16;
 
         while (num > 0 && addr < wrapAddr)
@@ -218,7 +218,7 @@ int8_t cmd_clrPage(char *argv[], uint8_t argc)
     
     while (num > 0)
     {
-        printf("%0x| clr\n", addr);
+        printf("%0lx| clr\n", addr);
         bspGpioSet(BSP_DEBUGPIN_0);
         ret = bspFlashErasePage(addr);
         bspGpioClear(BSP_DEBUGPIN_0);
@@ -226,7 +226,7 @@ int8_t cmd_clrPage(char *argv[], uint8_t argc)
         if (ret != BSP_OK) 
         {
             printf("bspStatus: %u\n", ret);
-            printf("flash err: 0x%x\n", bspFlashGetErr());
+            printf("flash err: 0x%lx\n", bspFlashGetErr());
             return -5;   
         }
 
@@ -266,7 +266,7 @@ int8_t cmd_write(char *argv[], uint8_t argc)
     if (ret != BSP_OK) 
     {
         printf("bspStatus: %u\n", ret);
-        printf("flash err: 0x%x\n", bspFlashGetErr());
+        printf("flash err: 0x%lx\n", bspFlashGetErr());
         return -5;   
     }
 
