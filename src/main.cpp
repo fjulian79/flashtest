@@ -22,7 +22,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define VERSIONSTRING      "rel_1_0_0"
+#define VERSIONSTRING       "rel_1_1_0"
+
+#define MIN_PAGE            (BSP_FLASH_NUMPAGES - 2)
 
 Cli cli;
 
@@ -148,7 +150,7 @@ int8_t cmd_dump(char *argv[], uint8_t argc)
             if(!cli.toUnsigned(argv[1], (void*)&num, sizeof(num)))
                 return -3;
 
-            if (num > BSP_FLASH_NUMPAGES)
+            if (num > BSP_FLASH_NUMPAGES - 1)
             {
                 printf("Invalid page number\n");
                 return -3;
@@ -206,9 +208,9 @@ int8_t cmd_clrPage(char *argv[], uint8_t argc)
         return -4;
     }
 
-    if (page < 126)
+    if (page < MIN_PAGE)
     {
-        printf("No access below page 126!\n");
+        printf("ERROR: Access below page %d prohibited!\n", MIN_PAGE);
         return -5;
     }
 
@@ -329,7 +331,11 @@ int main(void)
     bspGpioClear(BSP_DEBUGPIN_0);
     bspGpioClear(BSP_DEBUGPIN_1);
 
-    cmd_ver(0, 0);    
+    cmd_ver(0, 0);
+    printf("\n");
+    cmd_info(0, 0);
+    printf("\n");
+
     cli.init(cmd_table, arraysize(cmd_table));
 
     while (1)
