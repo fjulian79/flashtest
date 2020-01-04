@@ -47,7 +47,7 @@
 /**
  * Defines the fifo size used for TTY DMA transmissions.
  */
-#define BSP_TTY_TX_BUFSIZ               160
+#define BSP_TTY_TX_BUFSIZ               240
 
 /**
  * If enabled the RX interrupt will be enabled and the incoming data will be
