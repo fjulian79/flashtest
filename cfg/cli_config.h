@@ -54,7 +54,7 @@ extern "C" {
 /**
  * Defines the maximum number of arguments.
  */
-#define CLI_ARGV_SIZ                4
+#define CLI_ARGV_SIZ                6
 
 /**
  * Command termination, used to mark the end of a command.

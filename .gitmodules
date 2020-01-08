@@ -7,3 +7,6 @@
 [submodule "lib/libgeneric"]
 	path = lib/libgeneric
 	url = htsrv01:/home/git/repos/lib/libgeneric.git
+[submodule "lib/libfds"]
+	path = lib/libfds
+	url = htsrv01:/home/git/repos/lib/libfds.git

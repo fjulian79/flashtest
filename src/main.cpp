@@ -16,15 +16,17 @@
 #include "bsp/bsp_tty.h"
 #include "bsp/bsp_flash.h"
 
+#include "fds/fds.hpp"
 #include "cli/cli.h"
 #include "generic/generic.h"
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
-#define VERSIONSTRING       "rel_1_1_0"
+#define VERSIONSTRING       "rel_2_0_0"
 
-#define MIN_PAGE            (BSP_FLASH_NUMPAGES - 2)
+#define MIN_PAGE            (BSP_FLASH_NUMPAGES - 5)
 
 Cli cli;
 
@@ -59,7 +61,7 @@ int8_t cmd_help(char *argv[], uint8_t argc)
     printf("  ver               Used to print version infos.\n");
     printf("  info              Used to print flash information.\n");
     printf("  dump mode [...]   Dump either memory or a entire flash page.\n");
-    printf("     mode     p     Page mode, further args: addr num  [ascii]\n");
+    printf("     mode     p     Page mode, further args: addr num [ascii]\n");
     printf("              m     Memory mode, further args: page [ascii]\n");
     printf("     addr           Memory address as decimal or hex value.\n");
     printf("     num            Number of bytes to dump as hex or decimal value.\n");
@@ -73,6 +75,15 @@ int8_t cmd_help(char *argv[], uint8_t argc)
     printf("     val            uint16_t value to write in hex or decimal format.\n");
     printf("  lock              To lock the flash.\n");
     printf("  unlock            To unlock the flash.\n");
+    printf("  fds cmd [...]     Used to trigger one of the following fds commands:\n");
+    printf("     format         To format the fds flash pages.\n");
+    printf("     info           To print the fds status infos.\n");
+    printf("     write i v n    To write data.\n");
+    printf("                    i = fds data id.\n");
+    printf("                    v = byte value.\n");
+    printf("                    n = number of bytes with value v.\n");
+    printf("     delete id      To delete the given ID.\n");
+    printf("     dump           To print the sored data. \n");
     printf("  help              Prints this text.\n");
 
     return 0;
@@ -80,6 +91,7 @@ int8_t cmd_help(char *argv[], uint8_t argc)
 
 int8_t cmd_info(char *argv[], uint8_t argc)
 {
+    Fds *pFds = pFds->getInsance();
 	unused(argv);
     unused(argc);
 
@@ -88,6 +100,10 @@ int8_t cmd_info(char *argv[], uint8_t argc)
     printf("  Page Size: 0x%x\n", FLASH_PAGE_SIZE);
     printf("  Page Cnt:  %d\n", BSP_FLASH_NUMPAGES);
     printf("  Size:      %dKb\n", (FLASH_BANK1_END-FLASH_BASE+1)/1024);
+    printf("\n");
+    printf("FDS status:\n");
+    pFds->info();
+    printf("\n");
 
     return 0;
 }
@@ -191,7 +207,7 @@ int8_t cmd_clrPage(char *argv[], uint8_t argc)
 {
     uint8_t page=0;
     uint8_t num = 1;
-    uint32_t addr = FLASH_BASE;
+    uint16_t *addr = 0;
     bspStatus_t ret = BSP_OK;
 
     if (argc < 1)
@@ -214,11 +230,11 @@ int8_t cmd_clrPage(char *argv[], uint8_t argc)
         return -5;
     }
 
-    addr += page*FLASH_PAGE_SIZE;
+    addr = BSP_FLASH_PAGETOADDR(page);
     
     while (num > 0)
     {
-        printf("%0lx| clr\n", addr);
+        printf("%0lx| clr\n", (uint32_t)addr);
         bspGpioSet(BSP_DEBUGPIN_0);
         ret = bspFlashErasePage(addr);
         bspGpioClear(BSP_DEBUGPIN_0);
@@ -252,10 +268,10 @@ int8_t cmd_write(char *argv[], uint8_t argc)
     if(!cli.toUnsigned(argv[1], (void*)&val, sizeof(val)))
         return -3;
 
-    if (   (addr < (uint16_t *)(FLASH_BASE+(126*FLASH_PAGE_SIZE)))
-        || (addr > (uint16_t *)(FLASH_BASE+(128*FLASH_PAGE_SIZE)-1)))
+    if ((addr < BSP_FLASH_PAGETOADDR(MIN_PAGE)) ||
+        (addr > BSP_FLASH_PAGETOADDR(BSP_FLASH_NUMPAGES) - 1))
     {
-        printf("Dont wont to write to other pages then 126 or 127\n");
+        printf("ERROR: Access to adress out of range prohibited!\n");
         return -4;
     }
 
@@ -299,6 +315,98 @@ int8_t cmd_unlock(char *argv[], uint8_t argc)
     return 0;
 }
 
+int8_t fdswrite(char *argv[], uint8_t argc)
+{
+    Fds *pFds = pFds->getInsance();
+    uint8_t uid = 0;;
+    uint8_t val = 0;
+    uint16_t siz = 0;
+    uint8_t data[FDS_MAX_DATABYTES];
+
+    if (argc < 3)
+        return -1;
+
+    if(!cli.toUnsigned(argv[0], (void*)&uid, sizeof(uid)))
+        return -2;
+
+    if(!cli.toUnsigned(argv[1], (void*)&val, sizeof(val)))
+        return -3;
+
+    if(!cli.toUnsigned(argv[2], (void*)&siz, sizeof(siz)))
+        return -4;
+
+    if(siz > sizeof(data))
+        return -5;
+
+    for (size_t i = 0; i < siz; i++)
+        data[i] = val;
+    
+    return pFds->write(uid, data, siz);;
+}
+
+int8_t fdsdump(char *argv[], uint8_t argc)
+{
+    Fds *pFds = pFds->getInsance();
+    uint8_t data[FDS_MAX_DATABYTES];
+    size_t siz = 0;
+
+    unused(argv);
+    unused(argc);
+
+    for (uint8_t id = 0; id <FDS_NUM_RECORDS; id++)
+    {
+        siz = pFds->read(id, data, sizeof(data));
+        if (siz != 0)
+        {
+            printf("Got %u bytes for data Id %u:\n", siz, id);
+            memdump(data, siz, false);    
+        }
+        else
+        {
+            printf("Data Id %u not found.\n", id);
+        }
+    }
+    
+    return 0;
+}
+
+int8_t fdsdel(char *argv[], uint8_t argc)
+{
+    Fds *pFds = pFds->getInsance();
+    uint8_t uid = 0;
+
+    if (argc < 1)
+        return -1;
+
+    if(!cli.toUnsigned(argv[0], (void*)&uid, sizeof(uid)))
+        return -2;
+
+    return pFds->del(uid);
+}
+
+int8_t cmd_fds(char *argv[], uint8_t argc)
+{
+    Fds *pFds = pFds->getInsance();
+    uint8_t retval = 0;
+
+    if (argc < 1)
+        return -1;
+
+    if(strcmp("format", argv[0]) == 0)
+        retval = pFds->format();
+    else if(strcmp("info", argv[0]) == 0)
+        pFds->info();
+    else if(strcmp("write", argv[0]) == 0)
+        retval = fdswrite(&argv[1], argc-1);
+    else if(strcmp("dump", argv[0]) == 0)
+        retval = fdsdump(&argv[1], argc-1);
+    else if(strcmp("delete", argv[0]) == 0)
+        retval = fdsdel(&argv[1], argc-1);
+    else
+        retval = -2;
+
+    return retval;
+}
 
 cliCmd_t cmd_table[] =
 {
@@ -311,6 +419,7 @@ cliCmd_t cmd_table[] =
    {"write", cmd_write},
    {"lock", cmd_lock},
    {"unlock", cmd_unlock},
+   {"fds", cmd_fds},
    {0,      0}
 };
 
@@ -331,10 +440,10 @@ int main(void)
     bspGpioClear(BSP_DEBUGPIN_0);
     bspGpioClear(BSP_DEBUGPIN_1);
 
+    printf("\n\n");
     cmd_ver(0, 0);
     printf("\n");
     cmd_info(0, 0);
-    printf("\n");
 
     cli.init(cmd_table, arraysize(cmd_table));
 
