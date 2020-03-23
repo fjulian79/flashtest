@@ -31,9 +31,9 @@
 Cli cli;
 
 /**
- * @brief Prints the version inforamtion
+ * @brief Prints the version information
  * 
- * @param args      The arguemnt list
+ * @param args      The argument list
  * @return          0
  */
 int8_t cmd_ver(char *argv[], uint8_t argc)
@@ -83,7 +83,7 @@ int8_t cmd_help(char *argv[], uint8_t argc)
     printf("                    v = byte value.\n");
     printf("                    n = number of bytes with value v.\n");
     printf("     delete id      To delete the given ID.\n");
-    printf("     dump           To print the sored data. \n");
+    printf("     dump           To print the stored data. \n");
     printf("  help              Prints this text.\n");
 
     return 0;
@@ -91,7 +91,7 @@ int8_t cmd_help(char *argv[], uint8_t argc)
 
 int8_t cmd_info(char *argv[], uint8_t argc)
 {
-    Fds *pFds = pFds->getInsance();
+    Fds *pFds = pFds->getInstance();
 	unused(argv);
     unused(argc);
 
@@ -144,9 +144,9 @@ void memdump(uint8_t *addr, uint16_t num, bool ascii)
 }
 
 /**
- * @brief Used to print al lthe data registers.
+ * @brief Used to print all the data registers.
  * 
- * @param args      The arguemnt list
+ * @param args      The argument list
  * @return          0
  */
 int8_t cmd_dump(char *argv[], uint8_t argc)
@@ -271,7 +271,7 @@ int8_t cmd_write(char *argv[], uint8_t argc)
     if ((addr < BSP_FLASH_PAGETOADDR(MIN_PAGE)) ||
         (addr > BSP_FLASH_PAGETOADDR(BSP_FLASH_NUMPAGES) - 1))
     {
-        printf("ERROR: Access to adress out of range prohibited!\n");
+        printf("ERROR: Access to address out of range prohibited!\n");
         return -4;
     }
 
@@ -317,7 +317,7 @@ int8_t cmd_unlock(char *argv[], uint8_t argc)
 
 int8_t fdswrite(char *argv[], uint8_t argc)
 {
-    Fds *pFds = pFds->getInsance();
+    Fds *pFds = pFds->getInstance();
     uint8_t uid = 0;;
     uint8_t val = 0;
     uint16_t siz = 0;
@@ -346,7 +346,7 @@ int8_t fdswrite(char *argv[], uint8_t argc)
 
 int8_t fdsdump(char *argv[], uint8_t argc)
 {
-    Fds *pFds = pFds->getInsance();
+    Fds *pFds = pFds->getInstance();
     uint8_t data[FDS_MAX_DATABYTES];
     size_t siz = 0;
 
@@ -372,7 +372,7 @@ int8_t fdsdump(char *argv[], uint8_t argc)
 
 int8_t fdsdel(char *argv[], uint8_t argc)
 {
-    Fds *pFds = pFds->getInsance();
+    Fds *pFds = pFds->getInstance();
     uint8_t uid = 0;
 
     if (argc < 1)
@@ -386,7 +386,7 @@ int8_t fdsdel(char *argv[], uint8_t argc)
 
 int8_t cmd_fds(char *argv[], uint8_t argc)
 {
-    Fds *pFds = pFds->getInsance();
+    Fds *pFds = pFds->getInstance();
     uint8_t retval = 0;
 
     if (argc < 1)
