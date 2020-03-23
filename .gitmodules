@@ -10,3 +10,6 @@
 [submodule "lib/libfds"]
 	path = lib/libfds
 	url = https://github.com/fjulian79/libfds.git
+[submodule "lib/liblogging"]
+	path = lib/liblogging
+	url = https://github.com/fjulian79/liblogging.git
