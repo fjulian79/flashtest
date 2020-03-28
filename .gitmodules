@@ -1,12 +1,3 @@
-[submodule "lib/bsp-nucleo-f103"]
-	path = lib/bsp-nucleo-f103
-	url = https://github.com/fjulian79/bsp-stm32-f103.git
-[submodule "lib/libcli"]
-	path = lib/libcli
-	url = https://github.com/fjulian79/libcli.git
-[submodule "lib/libgeneric"]
-	path = lib/libgeneric
-	url = https://github.com/fjulian79/libgeneric.git
 [submodule "lib/libfds"]
 	path = lib/libfds
 	url = https://github.com/fjulian79/libfds.git

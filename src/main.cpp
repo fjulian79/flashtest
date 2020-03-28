@@ -29,7 +29,7 @@
 
 #include "fds/fds.hpp"
 #include "cli/cli.hpp"
-#include "generic/generic.h"
+#include "generic/generic.hpp"
 
 #include <stdio.h>
 #include <stdint.h>
