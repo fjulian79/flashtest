@@ -28,7 +28,7 @@
 #include "bsp/bsp_flash.h"
 
 #include "fds/fds.hpp"
-#include "cli/cli.h"
+#include "cli/cli.hpp"
 #include "generic/generic.h"
 
 #include <stdio.h>
