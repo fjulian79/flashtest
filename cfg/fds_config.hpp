@@ -42,7 +42,7 @@ extern "C" {
 #define FDS_NUM_PAGES                   4
 
 /**
- * @brief Defines the maximum number of user data bytes per record in the falsh.
+ * @brief Defines the maximum number of user data bytes per record in the flash.
  * Hence that this relates to the flash page size, the number of used pages and 
  * the number of supported records as every record mut start and end on the same 
  * flash page. 
@@ -50,7 +50,7 @@ extern "C" {
  * Example: FDS_NUM_PAGES and FDS_NUM_RECORDS set to 2, FDS_MAX_DATABYTES set to 
  * 512. The page size shall be 1024. 2 Records á 512 payload bytes will NOT fit 
  * with this configuration as each of them has 6 Bytes overhead and every page 
- * has a 4 Byte page header. Beside of that one page is requiered to be free at
+ * has a 4 Byte page header. Beside of that one page is required to be free at
  * any given time.
  */
 #define FDS_MAX_DATABYTES               256
